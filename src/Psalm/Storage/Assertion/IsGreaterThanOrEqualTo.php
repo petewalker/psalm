@@ -13,6 +13,11 @@ class IsGreaterThanOrEqualTo extends Assertion
         $this->value = $value;
     }
 
+    public function isNegation(): bool
+    {
+        return true;
+    }
+
     /** @psalm-mutation-free */
     public function getNegation(): Assertion
     {

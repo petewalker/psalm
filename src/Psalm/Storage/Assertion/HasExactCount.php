@@ -21,9 +21,15 @@ class HasExactCount extends Assertion
         return new DoesNotHaveExactCount($this->count);
     }
 
+    /** @psalm-mutation-free */
+    public function hasEquality(): bool
+    {
+        return true;
+    }
+
     public function __toString(): string
     {
-        return 'has-exact-count-' . $this->count;
+        return '=has-exact-count-' . $this->count;
     }
 
     /** @psalm-mutation-free */

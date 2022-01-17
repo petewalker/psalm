@@ -25,11 +25,18 @@ class IsNotLooselyEqual extends Assertion
         return new IsLooselyEqual($this->type);
     }
 
+    /** @psalm-mutation-free */
+    public function hasEquality(): bool
+    {
+        return true;
+    }
+
     public function __toString(): string
     {
         return '!~' . $this->type->getAssertionString(true);
     }
 
+    /** @psalm-mutation-free */
     public function getAtomicType(): ?Atomic
     {
         return $this->type;

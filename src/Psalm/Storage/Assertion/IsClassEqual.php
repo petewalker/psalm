@@ -19,6 +19,12 @@ class IsClassEqual extends Assertion
         return new IsClassNotEqual($this->type);
     }
 
+    /** @psalm-mutation-free */
+    public function hasEquality(): bool
+    {
+        return true;
+    }
+
     public function __toString(): string
     {
         return '=get-class-' . $this->type;

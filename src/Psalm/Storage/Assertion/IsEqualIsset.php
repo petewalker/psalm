@@ -18,6 +18,12 @@ class IsEqualIsset extends Assertion
     }
 
     /** @psalm-mutation-free */
+    public function hasEquality(): bool
+    {
+        return true;
+    }
+
+    /** @psalm-mutation-free */
     public function isNegationOf(Assertion $assertion): bool
     {
         return false;

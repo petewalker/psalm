@@ -25,6 +25,7 @@ class IsType extends Assertion
         return $this->type->getAssertionString(true);
     }
 
+    /** @psalm-mutation-free */
     public function getAtomicType(): ?Atomic
     {
         return $this->type;

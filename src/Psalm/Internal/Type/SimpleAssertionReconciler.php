@@ -19,7 +19,6 @@ use Psalm\Storage\Assertion\InArray;
 use Psalm\Storage\Assertion\IsCountable;
 use Psalm\Storage\Assertion\IsEqualIsset;
 use Psalm\Storage\Assertion\IsGreaterThan;
-use Psalm\Storage\Assertion\IsIdentical;
 use Psalm\Storage\Assertion\IsIsset;
 use Psalm\Storage\Assertion\IsLessThan;
 use Psalm\Storage\Assertion\IsLooselyEqual;
@@ -116,7 +115,7 @@ class SimpleAssertionReconciler extends Reconciler
 
         $old_var_type_string = $existing_var_type->getId();
 
-        $is_equality = $assertion instanceof IsIdentical || $assertion instanceof IsLooselyEqual;
+        $is_equality = $assertion->hasEquality();
 
         if ($assertion instanceof IsIsset || $assertion instanceof IsEqualIsset) {
             return self::reconcileIsset(

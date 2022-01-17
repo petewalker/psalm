@@ -12,11 +12,6 @@ use Psalm\Internal\Clause;
 use Psalm\Node\Expr\BinaryOp\VirtualBooleanAnd;
 use Psalm\Node\Expr\BinaryOp\VirtualBooleanOr;
 use Psalm\Node\Expr\VirtualBooleanNot;
-use Psalm\Storage\Assertion\IsEqualIsset;
-use Psalm\Storage\Assertion\IsIdentical;
-use Psalm\Storage\Assertion\IsLooselyEqual;
-use Psalm\Storage\Assertion\IsNotIdentical;
-use Psalm\Storage\Assertion\IsNotLooselyEqual;
 use Psalm\Storage\Assertion\Truthy;
 
 use function array_merge;
@@ -170,11 +165,7 @@ class FormulaGenerator
                                 spl_object_id($conditional->expr),
                                 false,
                                 true,
-                                $orred_types[0] instanceof IsEqualIsset
-                                    || $orred_types[0] instanceof IsIdentical
-                                    || $orred_types[0] instanceof IsLooselyEqual
-                                    || $orred_types[0] instanceof IsNotIdentical
-                                    || $orred_types[0] instanceof IsNotLooselyEqual,
+                                $orred_types[0]->hasEquality(),
                                 $redefined ? [$var => true] : []
                             );
                         }
@@ -441,11 +432,7 @@ class FormulaGenerator
                         $creating_object_id,
                         false,
                         true,
-                        $orred_types[0] instanceof IsEqualIsset
-                            || $orred_types[0] instanceof IsIdentical
-                            || $orred_types[0] instanceof IsLooselyEqual
-                            || $orred_types[0] instanceof IsNotIdentical
-                            || $orred_types[0] instanceof IsNotLooselyEqual,
+                        $orred_types[0]->hasEquality(),
                         $redefined ? [$var => true] : []
                     );
                 }

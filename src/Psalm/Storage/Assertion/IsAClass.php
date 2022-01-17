@@ -22,6 +22,7 @@ class IsAClass extends Assertion
         return new IsNotAClass($this->type, $this->allow_string);
     }
 
+    /** @psalm-mutation-free */
     public function getAtomicType(): ?Atomic
     {
         return $this->type;

@@ -25,9 +25,16 @@ class IsLooselyEqual extends Assertion
         return '~' . $this->type->getAssertionString(true);
     }
 
+    /** @psalm-mutation-free */
     public function getAtomicType(): ?Atomic
     {
         return $this->type;
+    }
+
+    /** @psalm-mutation-free */
+    public function hasEquality(): bool
+    {
+        return true;
     }
 
     public function setAtomicType(Atomic $type): void

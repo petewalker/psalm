@@ -19,6 +19,11 @@ class IsLessThanOrEqualTo extends Assertion
         return new IsGreaterThan($this->value);
     }
 
+    public function isNegation(): bool
+    {
+        return true;
+    }
+
     public function __toString(): string
     {
         return '!>' . $this->value;

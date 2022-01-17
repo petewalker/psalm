@@ -3,6 +3,8 @@
 namespace Psalm\Internal;
 
 use Psalm\Storage\Assertion;
+use Psalm\Type\Atomic\TClassConstant;
+use Psalm\Type\Atomic\TEnumCase;
 use Psalm\Type\Atomic\TLiteralFloat;
 use Psalm\Type\Atomic\TLiteralInt;
 use Psalm\Type\Atomic\TLiteralString;
@@ -279,19 +281,13 @@ class Clause
             $impossibility = [];
 
             foreach ($possibility as $type) {
-                if ((!$type instanceof Assertion\IsIdentical
-                        && !$type instanceof Assertion\IsLooselyEqual
-                        && !$type instanceof Assertion\IsNotIdentical
-                        && !$type instanceof Assertion\IsNotLooselyEqual
-                        && !$type instanceof Assertion\IsEqualIsset
-                        && !($type instanceof Assertion\NonEmptyCountable
-                            && !$type->is_negatable)
-                        && !($type instanceof Assertion\IsNotCountable
-                            && !$type->is_negatable))
+                if (!$type->hasEquality()
                     || (($inner_type = $type->getAtomicType())
                         && ($inner_type instanceof TLiteralInt
                             || $inner_type instanceof TLiteralFloat
-                            || $inner_type instanceof TLiteralString))
+                            || $inner_type instanceof TLiteralString
+                            || $inner_type instanceof TClassConstant
+                            || $inner_type instanceof TEnumCase))
                 ) {
                     $impossibility[] = $type->getNegation();
                 }

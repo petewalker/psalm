@@ -25,6 +25,11 @@ class NotInArray extends Assertion
         return '!in-array-' . $this->type;
     }
 
+    public function isNegation(): bool
+    {
+        return true;
+    }
+
     /** @psalm-mutation-free */
     public function isNegationOf(Assertion $assertion): bool
     {

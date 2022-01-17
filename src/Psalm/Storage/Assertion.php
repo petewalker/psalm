@@ -19,6 +19,13 @@ abstract class Assertion
         return false;
     }
 
+    /** @psalm-mutation-free */
+    public function hasEquality(): bool
+    {
+        return false;
+    }
+
+    /** @psalm-mutation-free */
     public function getAtomicType(): ?Atomic
     {
         return null;

@@ -3135,6 +3135,12 @@ class AssertionFinder
                     $if_types[$var_name] = [[new IsType(new TClosedResource())]];
                 } elseif (strpos($var_type, 'resource (') === 0) {
                     $if_types[$var_name] = [[new IsIdentical(new TResource())]];
+                } elseif ($var_type === 'integer') {
+                    $if_types[$var_name] = [[new IsType(new Atomic\TInt())]];
+                } elseif ($var_type === 'double') {
+                    $if_types[$var_name] = [[new IsType(new Atomic\TFloat())]];
+                } elseif ($var_type === 'boolean') {
+                    $if_types[$var_name] = [[new IsType(new Atomic\TBool())]];
                 } else {
                     $if_types[$var_name] = [[new IsType(Atomic::create($var_type))]];
                 }
@@ -3193,6 +3199,12 @@ class AssertionFinder
                 $if_types[$var_name] = [[new IsType(new TClosedResource())]];
             } elseif (strpos($var_type, 'resource (') === 0) {
                 $if_types[$var_name] = [[new IsIdentical(new TResource())]];
+            } elseif ($var_type === 'integer') {
+                $if_types[$var_name] = [[new IsType(new Atomic\TInt())]];
+            } elseif ($var_type === 'double') {
+                $if_types[$var_name] = [[new IsType(new Atomic\TFloat())]];
+            } elseif ($var_type === 'boolean') {
+                $if_types[$var_name] = [[new IsType(new Atomic\TBool())]];
             } else {
                 $if_types[$var_name] = [[new IsType(Atomic::create($var_type))]];
             }
@@ -3747,7 +3759,7 @@ class AssertionFinder
             );
 
             if ($var_name) {
-                $if_types[$var_name] = [[new NonEmptyCountable(false)]];
+                $if_types[$var_name] = [[new NonEmptyCountable($min_count === 1)]];
             }
 
             return $if_types ? [$if_types] : [];

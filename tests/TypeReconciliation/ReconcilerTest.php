@@ -12,6 +12,7 @@ use Psalm\Storage\Assertion;
 use Psalm\Storage\Assertion\Falsy;
 use Psalm\Storage\Assertion\IsIdentical;
 use Psalm\Storage\Assertion\IsLooselyEqual;
+use Psalm\Storage\Assertion\IsNotIdentical;
 use Psalm\Storage\Assertion\IsNotType;
 use Psalm\Storage\Assertion\IsType;
 use Psalm\Storage\Assertion\NonEmpty;
@@ -20,6 +21,7 @@ use Psalm\Tests\TestCase;
 use Psalm\Type;
 use Psalm\Type\Atomic\TArray;
 use Psalm\Type\Atomic\TClassConstant;
+use Psalm\Type\Atomic\TFalse;
 use Psalm\Type\Atomic\TFloat;
 use Psalm\Type\Atomic\TInt;
 use Psalm\Type\Atomic\TIterable;
@@ -29,6 +31,7 @@ use Psalm\Type\Atomic\TNamedObject;
 use Psalm\Type\Atomic\TNull;
 use Psalm\Type\Atomic\TNumeric;
 use Psalm\Type\Atomic\TObject;
+use Psalm\Type\Atomic\TTrue;
 use Psalm\Type\Union;
 
 class ReconcilerTest extends TestCase
@@ -129,6 +132,10 @@ class ReconcilerTest extends TestCase
             'falsyWithBool' => ['false', new Falsy(), 'bool'],
             'falsyWithStringOrNull' => ['""|"0"|null', new Falsy(), 'string|null'],
             'falsyWithScalarOrNull' => ['empty-scalar', new Falsy(), 'scalar'],
+            'trueWithBool' => ['true', new IsType(new TTrue()), 'bool'],
+            'falseWithBool' => ['false', new IsType(new TFalse()), 'bool'],
+            'notTrueWithBool' => ['false', new IsNotIdentical(new TTrue()), 'bool'],
+            'notFalseWithBool' => ['true', new IsNotIdentical(new TFalse()), 'bool'],
 
             'notSomeClassWithSomeClassPipeBool' => ['bool', new IsNotType(new TNamedObject('SomeClass')), 'SomeClass|bool'],
             'notSomeClassWithSomeClassPipeNull' => ['null', new IsNotType(new TNamedObject('SomeClass')), 'SomeClass|null'],

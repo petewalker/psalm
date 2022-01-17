@@ -50,10 +50,12 @@ use Psalm\Type\Atomic\TMixed;
 use Psalm\Type\Atomic\TNamedObject;
 use Psalm\Type\Atomic\TNull;
 use Psalm\Type\Atomic\TNumeric;
+use Psalm\Type\Atomic\TObject;
 use Psalm\Type\Atomic\TPositiveInt;
 use Psalm\Type\Atomic\TScalar;
 use Psalm\Type\Atomic\TString;
 use Psalm\Type\Atomic\TTemplateParam;
+use Psalm\Type\Atomic\TTemplateParamClass;
 use Psalm\Type\Reconciler;
 use Psalm\Type\Union;
 
@@ -155,22 +157,6 @@ class AssertionReconciler extends Reconciler
             );
         }
 
-        $simply_reconciled_type = SimpleAssertionReconciler::reconcile(
-            $assertion,
-            $codebase,
-            $existing_var_type,
-            $key,
-            $negated,
-            $code_location,
-            $suppressed_issues,
-            $failed_reconciliation,
-            $inside_loop
-        );
-
-        if ($simply_reconciled_type) {
-            return $simply_reconciled_type;
-        }
-
         if ($assertion instanceof IsAClass) {
             $should_return = false;
 
@@ -189,12 +175,30 @@ class AssertionReconciler extends Reconciler
             }
 
             $new_type_part = $new_type_parts[0];
-        } elseif ($assertion instanceof IsClassEqual) {
-            $new_type_part = Atomic::create($assertion->type, null, $template_type_map);
-        } elseif ($assertion_type = $assertion->getAtomicType()) {
-            $new_type_part = clone $assertion_type;
         } else {
-            $new_type_part = new TMixed();
+            $simply_reconciled_type = SimpleAssertionReconciler::reconcile(
+                $assertion,
+                $codebase,
+                $existing_var_type,
+                $key,
+                $negated,
+                $code_location,
+                $suppressed_issues,
+                $failed_reconciliation,
+                $inside_loop
+            );
+
+            if ($simply_reconciled_type) {
+                return $simply_reconciled_type;
+            }
+
+            if ($assertion instanceof IsClassEqual) {
+                $new_type_part = Atomic::create($assertion->type, null, $template_type_map);
+            } elseif ($assertion_type = $assertion->getAtomicType()) {
+                $new_type_part = clone $assertion_type;
+            } else {
+                $new_type_part = new TMixed();
+            }
         }
 
         if ($existing_var_type->hasMixed()) {
@@ -1543,6 +1547,13 @@ class AssertionReconciler extends Reconciler
         $existing_has_string = $existing_var_type->hasString();
 
         if ($existing_has_object && !$existing_has_string) {
+            if ($assertion_type instanceof TTemplateParamClass) {
+                return [new TTemplateParam(
+                    $assertion_type->param_name,
+                    new Union([$assertion_type->as_type ? clone $assertion_type->as_type : new TObject()]),
+                    $assertion_type->defining_class
+                )];
+            }
             return [$assertion_type];
         }
 

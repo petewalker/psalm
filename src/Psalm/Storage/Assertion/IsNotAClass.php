@@ -7,9 +7,11 @@ use Psalm\Type\Atomic;
 
 class IsNotAClass extends Assertion
 {
+    /** @var Atomic\TTemplateParamClass|Atomic\TNamedObject */
     public Atomic $type;
     public bool $allow_string;
 
+    /** @param Atomic\TTemplateParamClass|Atomic\TNamedObject $type */
     public function __construct(Atomic $type, bool $allow_string)
     {
         $this->type = $type;

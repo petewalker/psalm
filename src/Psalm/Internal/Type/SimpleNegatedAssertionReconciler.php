@@ -320,7 +320,7 @@ class SimpleNegatedAssertionReconciler extends Reconciler
             );
         }
 
-        if ($assertion_type instanceof TInt && !$existing_var_type->hasMixed()) {
+        if ($assertion_type && get_class($assertion_type) === TInt::class && !$existing_var_type->hasMixed()) {
             return self::reconcileInt(
                 $assertion,
                 $existing_var_type,
@@ -1649,11 +1649,11 @@ class SimpleNegatedAssertionReconciler extends Reconciler
         ?CodeLocation $code_location,
         array         $suppressed_issues
     ): Union {
-        $assertion_value = $assertion->value;
-
-        if ($assertion_value === null) {
+        if ($assertion->value === null) {
             return $existing_var_type;
         }
+
+        $assertion_value = $assertion->value - 1;
 
         $did_remove_type = false;
 
@@ -1758,11 +1758,11 @@ class SimpleNegatedAssertionReconciler extends Reconciler
         ?CodeLocation $code_location,
         array         $suppressed_issues
     ): Union {
-        $assertion_value = $assertion->value;
-
-        if ($assertion_value === null) {
+        if ($assertion->value === null) {
             return $existing_var_type;
         }
+
+        $assertion_value = $assertion->value + 1;
 
         $did_remove_type = false;
 

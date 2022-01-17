@@ -2591,7 +2591,13 @@ class AssertionFinder
             if ($type && $var_name) {
                 foreach ($type->getAtomicTypes() as $type_part) {
                     if ($type_part instanceof TTemplateParamClass) {
-                        $if_types[$var_name] = [[new IsNotIdentical($type_part)]];
+                        $if_types[$var_name] = [[new IsNotIdentical(
+                            new TTemplateParam(
+                                $type_part->param_name,
+                                new Union([$type_part->as_type ?: new TObject()]),
+                                $type_part->defining_class
+                            )
+                        )]];
                     }
                 }
             }
@@ -3291,7 +3297,15 @@ class AssertionFinder
             if ($type && $var_name) {
                 foreach ($type->getAtomicTypes() as $type_part) {
                     if ($type_part instanceof TTemplateParamClass) {
-                        $if_types[$var_name] = [[new IsIdentical($type_part)]];
+                        $if_types[$var_name] = [[
+                            new IsIdentical(new TTemplateParam(
+                                $type_part->param_name,
+                                $type_part->as_type
+                                    ? new Union([clone $type_part->as_type])
+                                    : Type::getObject(),
+                                $type_part->defining_class
+                            ))
+                        ]];
                     }
                 }
             }
@@ -3498,7 +3512,6 @@ class AssertionFinder
                     foreach ($second_arg_type->getAtomicTypes() as $second_arg_atomic_type) {
                         if ($second_arg_atomic_type instanceof TTemplateParamClass) {
                             $vals[] = [new IsAClass($second_arg_atomic_type, $third_arg_value === 'true')];
-                            ;
                         }
                     }
 

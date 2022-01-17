@@ -444,7 +444,7 @@ class SimpleAssertionReconciler extends Reconciler
             );
         }
 
-        if ($assertion_type instanceof TInt) {
+        if ($assertion_type && get_class($assertion_type) === TInt::class) {
             return self::reconcileInt(
                 $assertion,
                 $existing_var_type,

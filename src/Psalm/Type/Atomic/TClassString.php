@@ -33,6 +33,12 @@ class TClassString extends TString
      */
     public $as_type;
 
+    /** @var bool */
+    public $is_loaded = false;
+
+    /** @var bool */
+    public $is_interface = false;
+
     public function __construct(string $as = 'object', ?TNamedObject $as_type = null)
     {
         $this->as = $as;

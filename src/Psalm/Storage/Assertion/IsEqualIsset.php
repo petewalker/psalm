@@ -1,0 +1,25 @@
+<?php
+
+namespace Psalm\Storage\Assertion;
+
+use Psalm\Storage\Assertion;
+
+class IsEqualIsset extends Assertion
+{
+    /** @psalm-mutation-free */
+    public function getNegation(): Assertion
+    {
+        return new Any();
+    }
+
+    public function __toString(): string
+    {
+        return '=isset';
+    }
+
+    /** @psalm-mutation-free */
+    public function isNegationOf(Assertion $assertion): bool
+    {
+        return false;
+    }
+}

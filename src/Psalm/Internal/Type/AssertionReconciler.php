@@ -17,6 +17,7 @@ use Psalm\IssueBuffer;
 use Psalm\Storage\Assertion;
 use Psalm\Storage\Assertion\ArrayKeyExists;
 use Psalm\Storage\Assertion\Falsy;
+use Psalm\Storage\Assertion\HasAtLeastCount;
 use Psalm\Storage\Assertion\HasExactCount;
 use Psalm\Storage\Assertion\IsAClass;
 use Psalm\Storage\Assertion\IsClassEqual;
@@ -252,6 +253,7 @@ class AssertionReconciler extends Reconciler
         if ($assertion instanceof ArrayKeyExists
             || $assertion instanceof NonEmptyCountable
             || $assertion instanceof HasExactCount
+            || $assertion instanceof HasAtLeastCount
         ) {
             return Type::getMixed();
         }

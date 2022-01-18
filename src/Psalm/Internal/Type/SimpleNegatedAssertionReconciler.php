@@ -11,6 +11,7 @@ use Psalm\Issue\TypeDoesNotContainType;
 use Psalm\IssueBuffer;
 use Psalm\Storage\Assertion;
 use Psalm\Storage\Assertion\ArrayKeyDoesNotExist;
+use Psalm\Storage\Assertion\DoesNotHaveAtLeastCount;
 use Psalm\Storage\Assertion\DoesNotHaveExactCount;
 use Psalm\Storage\Assertion\Empty_;
 use Psalm\Storage\Assertion\Falsy;
@@ -207,6 +208,20 @@ class SimpleNegatedAssertionReconciler extends Reconciler
                 $failed_reconciliation,
                 $is_equality,
                 null
+            );
+        }
+
+        if ($assertion instanceof DoesNotHaveAtLeastCount) {
+            return self::reconcileNotNonEmptyCountable(
+                $assertion,
+                $existing_var_type,
+                $key,
+                $negated,
+                $code_location,
+                $suppressed_issues,
+                $failed_reconciliation,
+                $is_equality,
+                $assertion->count
             );
         }
 
@@ -510,7 +525,8 @@ class SimpleNegatedAssertionReconciler extends Reconciler
             if (($array_atomic_type instanceof TNonEmptyArray
                     || $array_atomic_type instanceof TNonEmptyList)
                 && ($min_count === null
-                    || $array_atomic_type->count >= $min_count)
+                    || $array_atomic_type->count >= $min_count
+                    || $array_atomic_type->min_count >= $min_count)
             ) {
                 $did_remove_type = true;
 

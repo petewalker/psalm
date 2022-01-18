@@ -27,7 +27,7 @@ class IsNotType extends Assertion
 
     public function __toString(): string
     {
-        return '!' . $this->type->getAssertionString(true);
+        return '!' . $this->type->getId();
     }
 
     /** @psalm-mutation-free */

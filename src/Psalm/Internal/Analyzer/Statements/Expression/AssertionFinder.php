@@ -37,9 +37,11 @@ use Psalm\Issue\UnevaluatedCode;
 use Psalm\IssueBuffer;
 use Psalm\Storage\Assertion;
 use Psalm\Storage\Assertion\ArrayKeyExists;
+use Psalm\Storage\Assertion\DoesNotHaveAtLeastCount;
 use Psalm\Storage\Assertion\DoesNotHaveExactCount;
 use Psalm\Storage\Assertion\Empty_;
 use Psalm\Storage\Assertion\Falsy;
+use Psalm\Storage\Assertion\HasAtLeastCount;
 use Psalm\Storage\Assertion\HasExactCount;
 use Psalm\Storage\Assertion\HasMethod;
 use Psalm\Storage\Assertion\InArray;
@@ -1758,6 +1760,28 @@ class AssertionFinder
                 ($conditional instanceof PhpParser\Node\Expr\BinaryOp\Smaller ? 1 : 0);
 
             return self::ASSIGNMENT_TO_LEFT;
+        }
+
+        return false;
+    }
+
+    /**
+     * @param PhpParser\Node\Expr\BinaryOp\Greater|PhpParser\Node\Expr\BinaryOp\GreaterOrEqual $conditional
+     * @return false|int
+     */
+    protected static function hasReconcilableNonEmptyCountEqualityCheck(
+        PhpParser\Node\Expr\BinaryOp $conditional
+    ) {
+        $left_count = $conditional->left instanceof PhpParser\Node\Expr\FuncCall
+            && $conditional->left->name instanceof PhpParser\Node\Name
+            && strtolower($conditional->left->name->parts[0]) === 'count';
+
+        $right_number = $conditional->right instanceof PhpParser\Node\Scalar\LNumber
+            && $conditional->right->value === (
+                $conditional instanceof PhpParser\Node\Expr\BinaryOp\Greater ? 0 : 1);
+
+        if ($left_count && $right_number) {
+            return self::ASSIGNMENT_TO_RIGHT;
         }
 
         return false;
@@ -3772,7 +3796,15 @@ class AssertionFinder
             );
 
             if ($var_name) {
-                $if_types[$var_name] = [[new NonEmptyCountable($min_count === 1)]];
+                if (self::hasReconcilableNonEmptyCountEqualityCheck($conditional)) {
+                    $if_types[$var_name] = [[new NonEmptyCountable(true)]];
+                } else {
+                    if ($min_count > 0) {
+                        $if_types[$var_name] = [[new HasAtLeastCount($min_count)]];
+                    } else {
+                        $if_types[$var_name] = [[new NonEmptyCountable(false)]];
+                    }
+                }
             }
 
             return $if_types ? [$if_types] : [];
@@ -3793,8 +3825,8 @@ class AssertionFinder
             );
 
             if ($var_name) {
-                if ($max_count) {
-                    // can't say anything for sure
+                if ($max_count > 0) {
+                    $if_types[$var_name] = [[new DoesNotHaveAtLeastCount($max_count + 1)]];
                 } else {
                     $if_types[$var_name] = [[new NotNonEmptyCountable()]];
                 }
@@ -3880,8 +3912,8 @@ class AssertionFinder
             );
 
             if ($var_name) {
-                if ($min_count) {
-                    $if_types[$var_name] = [[new NonEmptyCountable(true)]];
+                if ($min_count > 0) {
+                    $if_types[$var_name] = [[new HasAtLeastCount($min_count)]];
                 } else {
                     $if_types[$var_name] = [[new NonEmptyCountable(false)]];
                 }
@@ -3905,8 +3937,8 @@ class AssertionFinder
             );
 
             if ($var_name) {
-                if ($max_count) {
-                    // can't say anything definitive
+                if ($max_count > 0) {
+                    $if_types[$var_name] = [[new DoesNotHaveAtLeastCount($max_count + 1)]];
                 } else {
                     $if_types[$var_name] = [[new NotNonEmptyCountable()]];
                 }

@@ -1480,6 +1480,7 @@ class TypeCombiner
                     $array_type = new TNonEmptyList($generic_type_params[1]);
 
                     if ($combination->array_counts && count($combination->array_counts) === 1) {
+                        /** @psalm-suppress PropertyTypeCoercion */
                         $array_type->count = array_keys($combination->array_counts)[0];
                     }
                 }
@@ -1487,6 +1488,7 @@ class TypeCombiner
                 $array_type = new TNonEmptyArray($generic_type_params);
 
                 if ($combination->array_counts && count($combination->array_counts) === 1) {
+                    /** @psalm-suppress PropertyTypeCoercion */
                     $array_type->count = array_keys($combination->array_counts)[0];
                 }
             }

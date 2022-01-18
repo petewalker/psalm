@@ -18,6 +18,11 @@ class IsNotAClass extends Assertion
         $this->allow_string = $allow_string;
     }
 
+    public function isNegation(): bool
+    {
+        return true;
+    }
+
     /** @psalm-mutation-free */
     public function getNegation(): Assertion
     {

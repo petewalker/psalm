@@ -47,7 +47,8 @@ class TClassString extends TString
 
     public function getKey(bool $include_extra = true): string
     {
-        return 'class-string' . ($this->as === 'object' ? '' : '<' . $this->as_type . '>');
+        return ($this->is_interface ? 'interface' : 'class')
+            . '-string' . ($this->as === 'object' ? '' : '<' . $this->as_type . '>');
     }
 
     public function __toString(): string
@@ -57,7 +58,9 @@ class TClassString extends TString
 
     public function getId(bool $nested = false): string
     {
-        return $this->getKey();
+        return ($this->is_loaded ? 'loaded-' : '')
+            . ($this->is_interface ? 'interface' : 'class')
+            . '-string' . ($this->as === 'object' ? '' : '<' . $this->as_type . '>');
     }
 
     public function getAssertionString(bool $exact = false): string

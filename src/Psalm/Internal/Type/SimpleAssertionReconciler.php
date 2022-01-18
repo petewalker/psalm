@@ -11,6 +11,7 @@ use Psalm\Storage\Assertion;
 use Psalm\Storage\Assertion\Any;
 use Psalm\Storage\Assertion\ArrayKeyExists;
 use Psalm\Storage\Assertion\HasArrayKey;
+use Psalm\Storage\Assertion\HasAtLeastCount;
 use Psalm\Storage\Assertion\HasExactCount;
 use Psalm\Storage\Assertion\HasIntOrStringArrayAccess;
 use Psalm\Storage\Assertion\HasMethod;
@@ -260,8 +261,20 @@ class SimpleAssertionReconciler extends Reconciler
                 $code_location,
                 $suppressed_issues,
                 $failed_reconciliation,
-                $is_equality,
-                null
+                $is_equality
+            );
+        }
+
+        if ($assertion instanceof HasAtLeastCount) {
+            return self::reconcileNonEmptyCountable(
+                $assertion,
+                $existing_var_type,
+                $key,
+                $negated,
+                $code_location,
+                $suppressed_issues,
+                $failed_reconciliation,
+                $is_equality
             );
         }
 
@@ -576,8 +589,7 @@ class SimpleAssertionReconciler extends Reconciler
         ?CodeLocation $code_location,
         array $suppressed_issues,
         int &$failed_reconciliation,
-        bool $is_equality,
-        ?int $min_count
+        bool $is_equality
     ): Union {
         $old_var_type_string = $existing_var_type->getId();
 
@@ -587,17 +599,18 @@ class SimpleAssertionReconciler extends Reconciler
 
             if ($array_atomic_type instanceof TArray) {
                 if (!$array_atomic_type instanceof TNonEmptyArray
-                    || ($array_atomic_type->count < $min_count)
+                    || ($assertion instanceof HasAtLeastCount
+                        && $array_atomic_type->min_count < $assertion->count)
                 ) {
-                    if ($array_atomic_type->isEmptyArray()) {
+                    if ($array_atomic_type->getId() === 'array<empty, empty>') {
                         $existing_var_type->removeType('array');
                     } else {
                         $non_empty_array = new TNonEmptyArray(
                             $array_atomic_type->type_params
                         );
 
-                        if ($min_count) {
-                            $non_empty_array->count = $min_count;
+                        if ($assertion instanceof HasAtLeastCount) {
+                            $non_empty_array->min_count = $assertion->count;
                         }
 
                         $existing_var_type->addType($non_empty_array);
@@ -607,14 +620,15 @@ class SimpleAssertionReconciler extends Reconciler
                 }
             } elseif ($array_atomic_type instanceof TList) {
                 if (!$array_atomic_type instanceof TNonEmptyList
-                    || ($array_atomic_type->count < $min_count)
+                    || ($assertion instanceof HasAtLeastCount
+                        && $array_atomic_type->count < $assertion->count)
                 ) {
                     $non_empty_list = new TNonEmptyList(
                         $array_atomic_type->type_param
                     );
 
-                    if ($min_count) {
-                        $non_empty_list->count = $min_count;
+                    if ($assertion instanceof HasAtLeastCount) {
+                        $non_empty_list->min_count = $assertion->count;
                     }
 
                     $did_remove_type = true;

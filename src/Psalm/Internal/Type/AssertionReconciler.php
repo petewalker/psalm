@@ -418,7 +418,7 @@ class AssertionReconciler extends Reconciler
 
             if ($code_location
                 && $key
-                && !($assertion instanceof IsIdentical || $assertion instanceof IsLooselyEqual)
+                && !$assertion->hasEquality()
                 && $new_type_part instanceof TNamedObject
                 && !$new_type_has_interface
                 && (!($statements_analyzer->getSource()->getSource() instanceof TraitAnalyzer)

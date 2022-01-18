@@ -646,9 +646,23 @@ class SimpleAssertionReconciler extends Reconciler
                 if ($assertion instanceof HasAtLeastCount) {
                     if ($array_atomic_type->sealed && $assertion->count > $min_count) {
                         $existing_var_type->removeType('array');
+                        $did_remove_type = true;
+                    } elseif (!$array_atomic_type->sealed
+                        && $array_atomic_type->is_list
+                        && $min_count === $prop_count
+                    ) {
+                        if ($assertion->count <= $min_count) {
+                            // this means a redundant condition
+                        } else {
+                            $did_remove_type = true;
+                            for ($i = $prop_count; $i < $assertion->count; $i++) {
+                                $array_atomic_type->properties[$i]
+                                    = clone ($array_atomic_type->previous_value_type ?: Type::getMixed());
+                            }
+                        }
+                    } else {
+                        $did_remove_type = true;
                     }
-
-                    $did_remove_type = true;
                 } elseif ($min_count !== $prop_count) {
                     $did_remove_type = true;
                 }

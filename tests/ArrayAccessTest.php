@@ -296,7 +296,7 @@ class ArrayAccessTest extends TestCase
         $this->analyzeFile('somefile.php', new Context());
     }
 
-    public function testCountOnKeyedArray(): void
+    public function testCountOnKeyedArrayInRange(): void
     {
         Config::getInstance()->ensure_array_int_offsets_exist = true;
 
@@ -305,11 +305,35 @@ class ArrayAccessTest extends TestCase
             '<?php
                 /** @param non-empty-list<string> $list */
                 function bar(array $list) : void {
-                    if ($list[0]) {
-                        $list[0] = $list[0] . "a";
-                        if (count($list) > 1) {
-                            echo $list[1];
-                        }
+                    if (rand(0, 1)) {
+                        $list = ["a"];
+                    }
+                    if (count($list) > 1) {
+                        echo $list[1];
+                    }
+                }'
+        );
+
+        $this->analyzeFile('somefile.php', new Context());
+    }
+
+    public function testCountOnKeyedArrayOutOfRange(): void
+    {
+        Config::getInstance()->ensure_array_int_offsets_exist = true;
+
+        $this->expectException(CodeException::class);
+        $this->expectExceptionMessage('PossiblyUndefinedIntArrayOffset');
+
+        $this->addFile(
+            'somefile.php',
+            '<?php
+                /** @param non-empty-list<string> $list */
+                function bar(array $list) : void {
+                    if (rand(0, 1)) {
+                        $list = ["a"];
+                    }
+                    if (count($list) > 1) {
+                        echo $list[2];
                     }
                 }'
         );

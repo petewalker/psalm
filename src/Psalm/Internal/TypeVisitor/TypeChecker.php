@@ -127,16 +127,6 @@ class TypeChecker extends NodeVisitor
             $this->checkTemplateParam($type);
         } elseif ($type instanceof TResource) {
             $this->checkResource($type);
-        } elseif ($type instanceof TArray) {
-            if (count($type->type_params) > 2) {
-                IssueBuffer::maybeAdd(
-                    new TooManyTemplateParams(
-                        $type->getId(). ' has too many template params, expecting 2',
-                        $this->code_location
-                    ),
-                    $this->suppressed_issues
-                );
-            }
         }
 
         $type->checked = true;

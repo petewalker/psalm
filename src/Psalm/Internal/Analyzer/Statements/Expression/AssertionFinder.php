@@ -3394,19 +3394,25 @@ class AssertionFinder
                     )
                 );
 
-            $orred_types = [];
+            if (count($var_type->getAtomicTypes()) === 1) {
+                $orred_types = [];
 
-            foreach ($var_type->getAtomicTypes() as $atomic_var_type) {
-                if ($identical) {
-                    $orred_types[] = new IsIdentical($atomic_var_type);
-                } else {
-                    $orred_types[] = new IsLooselyEqual($atomic_var_type);
+                foreach ($var_type->getAtomicTypes() as $atomic_var_type) {
+                    if ($identical) {
+                        $orred_types[] = new IsIdentical($atomic_var_type);
+                    } else {
+                        $orred_types[] = new IsLooselyEqual($atomic_var_type);
+                    }
                 }
+
+                $if_types[$var_name] = [$orred_types];
             }
 
-            $if_types[$var_name] = [$orred_types];
-
-            if ($other_var_name && $other_type && !$other_type->isMixed()) {
+            if ($other_var_name
+                && $other_type
+                && !$other_type->isMixed()
+                && count($other_type->getAtomicTypes()) === 1
+            ) {
                 $orred_types = [];
 
                 foreach ($other_type->getAtomicTypes() as $atomic_other_type) {

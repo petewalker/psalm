@@ -296,6 +296,27 @@ class ArrayAccessTest extends TestCase
         $this->analyzeFile('somefile.php', new Context());
     }
 
+    public function testCountOnKeyedArray(): void
+    {
+        Config::getInstance()->ensure_array_int_offsets_exist = true;
+
+        $this->addFile(
+            'somefile.php',
+            '<?php
+                /** @param non-empty-list<string> $list */
+                function bar(array $list) : void {
+                    if ($list[0]) {
+                        $list[0] = $list[0] . "a";
+                        if (count($list) > 1) {
+                            echo $list[1];
+                        }
+                    }
+                }'
+        );
+
+        $this->analyzeFile('somefile.php', new Context());
+    }
+
     public function testEnsureListOffsetExistsAfterCountValueOutOfRange(): void
     {
         Config::getInstance()->ensure_array_int_offsets_exist = true;

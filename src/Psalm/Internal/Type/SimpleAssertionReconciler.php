@@ -635,11 +635,22 @@ class SimpleAssertionReconciler extends Reconciler
                     $existing_var_type->addType($non_empty_list);
                 }
             } elseif ($array_atomic_type instanceof TKeyedArray) {
+                $prop_count = count($array_atomic_type->properties);
+                $min_count = 0;
                 foreach ($array_atomic_type->properties as $property_type) {
-                    if ($property_type->possibly_undefined) {
-                        $did_remove_type = true;
-                        break;
+                    if (!$property_type->possibly_undefined) {
+                        $min_count++;
                     }
+                }
+
+                if ($assertion instanceof HasAtLeastCount) {
+                    if ($array_atomic_type->sealed && $assertion->count > $min_count) {
+                        $existing_var_type->removeType('array');
+                    }
+
+                    $did_remove_type = true;
+                } elseif ($min_count !== $prop_count) {
+                    $did_remove_type = true;
                 }
             }
 

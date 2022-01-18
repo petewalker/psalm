@@ -182,7 +182,7 @@ class NegatedAssertionReconciler extends Reconciler
             $existing_var_type->removeType('array-key');
             $existing_var_type->addType(new TString);
         } elseif ($assertion instanceof IsClassNotEqual) {
-            $assertion_type = Atomic::create($assertion->type);
+            // do nothing
         } elseif ($existing_var_type->isSingle()
             && $existing_var_type->hasNamedObjectType()
             && $assertion_type instanceof TNamedObject

@@ -779,8 +779,10 @@ class AssertionFinder
                 $class_string_type = new TClassString();
                 if ($class_exists_check_type === 1) {
                     $class_string_type->is_loaded = true;
+                    $if_types[$first_var_name] = [[new IsIdentical($class_string_type)]];
+                } else {
+                    $if_types[$first_var_name] = [[new IsType($class_string_type)]];
                 }
-                $if_types[$first_var_name] = [[new IsType($class_string_type)]];
             }
         } elseif ($class_exists_check_type = self::hasTraitExistsCheck($expr)) {
             if ($first_var_name) {

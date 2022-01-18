@@ -545,6 +545,14 @@ class TypeCombiner
                     }
                 }
 
+                if ($combination->array_min_counts !== null) {
+                    if ($type->min_count === null) {
+                        $combination->array_min_counts = null;
+                    } else {
+                        $combination->array_min_counts[$type->min_count] = true;
+                    }
+                }
+
                 $combination->array_sometimes_filled = true;
             } else {
                 $combination->array_always_filled = false;
@@ -583,6 +591,14 @@ class TypeCombiner
                         $combination->array_counts = null;
                     } else {
                         $combination->array_counts[$type->count] = true;
+                    }
+                }
+
+                if ($combination->array_min_counts !== null) {
+                    if ($type->min_count === null) {
+                        $combination->array_min_counts = null;
+                    } else {
+                        $combination->array_min_counts[$type->min_count] = true;
                     }
                 }
 
@@ -715,6 +731,16 @@ class TypeCombiner
 
             if ($combination->array_counts !== null) {
                 $combination->array_counts[count($type->properties)] = true;
+            }
+
+            if ($combination->array_min_counts !== null) {
+                $min_prop_count = count(
+                    array_filter(
+                        $type->properties,
+                        fn($p) => $p->possibly_undefined
+                    )
+                );
+                $combination->array_min_counts[$min_prop_count] = true;
             }
 
             foreach ($possibly_undefined_entries as $possibly_undefined_type) {
@@ -1483,6 +1509,11 @@ class TypeCombiner
                         /** @psalm-suppress PropertyTypeCoercion */
                         $array_type->count = array_keys($combination->array_counts)[0];
                     }
+
+                    if ($combination->array_min_counts) {
+                        /** @psalm-suppress PropertyTypeCoercion */
+                        $array_type->min_count = min(array_keys($combination->array_min_counts));
+                    }
                 }
             } else {
                 $array_type = new TNonEmptyArray($generic_type_params);
@@ -1490,6 +1521,11 @@ class TypeCombiner
                 if ($combination->array_counts && count($combination->array_counts) === 1) {
                     /** @psalm-suppress PropertyTypeCoercion */
                     $array_type->count = array_keys($combination->array_counts)[0];
+                }
+
+                if ($combination->array_min_counts) {
+                    /** @psalm-suppress PropertyTypeCoercion */
+                    $array_type->min_count = min(array_keys($combination->array_min_counts));
                 }
             }
         } else {
